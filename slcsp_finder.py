@@ -1,3 +1,4 @@
+import argparse
 import os
 
 import pandas as pd
@@ -38,12 +39,10 @@ def get_zipcode_to_rate_area(df):
     return df.groupby('zipcode').agg({'state': 'first', 'rate_area': 'first'})
 
 
-def find_slcsp():
-    script_dir = os.path.dirname(__file__)
-
-    plans = pd.read_csv(os.path.join(script_dir, 'data', 'plans.csv'))
-    zips = pd.read_csv(os.path.join(script_dir, 'data', 'zips.csv'), dtype={'zipcode': str})
-    slcsp = pd.read_csv(os.path.join(script_dir, 'data', 'slcsp.csv'), dtype={'zipcode': str})
+def find_slcsp(plans_data, zips_data, slcsp_data):
+    plans = pd.read_csv(plans_data)
+    zips = pd.read_csv(zips_data, dtype={'zipcode': str})
+    slcsp = pd.read_csv(slcsp_data, dtype={'zipcode': str})
 
     # Filter out non-silver metal level plans
     plans = filter_silver_plans(plans)
@@ -54,7 +53,7 @@ def find_slcsp():
     # Filter all zipcodes based on whether they are
     #   1. in multiple rate areas
     #   2. in multiple states (thus multiple rate areas)
-    # Either of these conditions make SLCSP indeterminate
+    # Either of these conditions make SLCSP indeterminable
     zips = get_zipcode_to_rate_area(zips)
 
     # Merge filtered zipcodes onto SLCSP DF. Now we can use state rate areas in plans DF to get rate
@@ -69,4 +68,15 @@ def find_slcsp():
 
 
 if __name__ == '__main__':
-    find_slcsp()
+    parser = argparse.ArgumentParser()
+    script_dir = os.path.dirname(__file__)
+    default_plans_data = os.path.join(script_dir, 'data', 'plans.csv')
+    default_zips_data = os.path.join(script_dir, 'data', 'zips.csv')
+    default_slcsp_data = os.path.join(script_dir, 'data', 'slcsp.csv')
+
+    parser.add_argument('--plans', help='Path to custom "plans.csv" file', default=default_plans_data)
+    parser.add_argument('--zips', help='Path to custom "zips.csv" file', default=default_zips_data)
+    parser.add_argument('--slcsp', help='Path to custom "slcsp.csv" file', default=default_slcsp_data)
+
+    args = parser.parse_args()
+    find_slcsp(args.plans, args.zips, args.slcsp)
