@@ -24,6 +24,7 @@ def get_rate_area_to_slcsp(df):
         lambda x: sorted(x.unique())[1] if len(x) >= 2 else ''
     )
 
+
 def get_zipcode_to_rate_area(df):
     """
     Filters the given DataFrame to include only zipcodes that have a single state and a single rate area.
@@ -35,6 +36,7 @@ def get_zipcode_to_rate_area(df):
         lambda x: len(x['state'].unique()) == 1 and len(x['rate_area'].unique()) == 1
     )
     return df.groupby('zipcode').agg({'state': 'first', 'rate_area': 'first'})
+
 
 def find_slcsp():
     script_dir = os.path.dirname(__file__)
@@ -49,15 +51,21 @@ def find_slcsp():
     # Group plans on state rate area, and store second-highest cost if >= 2 rates, else store ''
     plans = get_rate_area_to_slcsp(plans)
 
-    print(plans)
-
     # Filter all zipcodes based on whether they are
     #   1. in multiple rate areas
     #   2. in multiple states (thus multiple rate areas)
     # Either of these conditions make SLCSP indeterminate
     zips = get_zipcode_to_rate_area(zips)
 
-    print(zips)
+    # Merge filtered zipcodes onto SLCSP DF. Now we can use state rate areas in plans DF to get rate
+    slcsp = slcsp.merge(zips, on='zipcode', how='left')
+    slcsp['rate_area'] = slcsp['rate_area'].fillna(-1).astype('Int64')
+
+    for index, row in slcsp.iterrows():
+        if (row['state'], row['rate_area']) in plans:
+            print(row['zipcode'] + ',' + str(plans[row['state'], row['rate_area']]))
+        else:
+            print(row['zipcode'] + ',')
 
 
 if __name__ == '__main__':
