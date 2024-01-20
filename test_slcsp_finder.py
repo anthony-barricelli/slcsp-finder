@@ -42,7 +42,7 @@ class TestSlcspFinder(unittest.TestCase):
 
     def test_get_rate_area_to_slcsp(self):
         result = slcsp_finder.get_rate_area_to_slcsp(self.silver_plans_df)
-        self.assertEqual(100, result[('NY', 1)])
+        self.assertEqual('100.00', result[('NY', 1)])
         self.assertEqual('', result[('MA', 1)])
 
     def test_get_zipcode_to_rate_area(self):

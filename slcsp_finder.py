@@ -40,6 +40,17 @@ def get_zipcode_to_rate_area(df):
 
 
 def find_slcsp(plans_data, zips_data, slcsp_data):
+    """
+    :param plans_data: Path to the CSV file containing plan data.
+    :param zips_data: Path to the CSV file containing zip code data.
+    :param slcsp_data: Path to the CSV file containing slcsp data.
+    :return: None
+
+    Find the Second Least Cost Silver Plan (SLCSP) for the given zipcodes in slcsp_data and
+    display them as comma separated values, in order that they were given. Indeterminable
+    SLCSP rates are displayed as an empty string.
+    """
+
     plans = pd.read_csv(plans_data)
     zips = pd.read_csv(zips_data, dtype={'zipcode': str})
     slcsp = pd.read_csv(slcsp_data, dtype={'zipcode': str})
