@@ -18,7 +18,18 @@ def find_slcsp():
         lambda x: sorted(x.unique())[1] if len(x) >= 2 else ''
     )
 
-    print(plans)
+    #print(plans)
+
+    # Filter all zipcodes based on whether they are
+    #   1. in multiple rate areas
+    #   2. in multiple states (thus multiple rate areas)
+    # Either of these conditions make SLCSP indeterminate
+    zips = zips.groupby('zipcode').filter(
+        lambda x: len(x['state'].unique()) == 1 and len(x['rate_area'].unique()) == 1
+    )
+    zips = zips.groupby('zipcode').agg({'state': 'first', 'rate_area': 'first'})
+
+    print(zips)
 
 
 if __name__ == '__main__':
