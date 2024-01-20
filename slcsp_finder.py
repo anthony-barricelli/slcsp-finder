@@ -61,6 +61,10 @@ def find_slcsp(plans_data, zips_data, slcsp_data):
     # Group plans on state rate area, and store second-highest cost if >= 2 rates, else store ''
     plans = get_rate_area_to_slcsp(plans)
 
+    # Reduce zips by relevant (requested) zip codes
+    relevant_zipcodes = set(slcsp['zipcode'])
+    zips = zips[zips['zipcode'].isin(relevant_zipcodes)]
+
     # Filter all zipcodes based on whether they are
     #   1. in multiple rate areas
     #   2. in multiple states (thus multiple rate areas)
