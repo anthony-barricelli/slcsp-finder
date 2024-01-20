@@ -22,7 +22,7 @@ def get_rate_area_to_slcsp(df):
     :return: A pandas DataFrame with the second least rate for each state and rate area.
     """
     return df.groupby(['state', 'rate_area'])['rate'].apply(
-        lambda x: sorted(x.unique())[1] if len(x) >= 2 else ''
+        lambda x: '{:.2f}'.format(sorted(x.unique())[1]) if len(x) >= 2 else ''
     )
 
 
@@ -60,9 +60,11 @@ def find_slcsp(plans_data, zips_data, slcsp_data):
     slcsp = slcsp.merge(zips, on='zipcode', how='left')
     slcsp['rate_area'] = slcsp['rate_area'].fillna(-1).astype('Int64')
 
+    # Print out results as specified by assignment
+    print('zipcode, rate')
     for index, row in slcsp.iterrows():
         if (row['state'], row['rate_area']) in plans:
-            print(row['zipcode'] + ',' + str(plans[row['state'], row['rate_area']]))
+            print(row['zipcode'] + ',' + plans[row['state'], row['rate_area']])
         else:
             print(row['zipcode'] + ',')
 
